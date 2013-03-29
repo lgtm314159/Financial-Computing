@@ -24,6 +24,14 @@ public class RandomVectorGeneratorImpl implements RandomVectorGenerator {
     for (int i = 0; i < rdVec.length; ++i) {
       rdVec[i] = gr.nextNormalizedDouble();
     }
+    
+    /*
+    System.out.print("Vector of size " + rdVec.length + ": ");
+    for (int i = 0; i < rdVec.length; ++i) {
+      System.out.print(rdVec[i] + " ");
+    }
+    System.out.println("\n");
+    */
     return rdVec;
   }
 

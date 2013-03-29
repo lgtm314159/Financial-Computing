@@ -12,6 +12,11 @@ public class Test {
     System.out.println();
     System.out.println(sp.getPrices());
 
+    NormalDistribution nd = new NormalDistribution();
+    double q = nd.inverseCumulativeProbability((0.997 + 1) / 2);
+    System.out.println(q);
+
+
   }
 }
 

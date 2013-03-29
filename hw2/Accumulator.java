@@ -10,11 +10,11 @@ public class Accumulator {
     return quadMean;
   }
 
-  public void accumMean(double newVal, int n) {
+  public void accumMean(double newVal, long n) {
     mean = (n - 1) * mean / n + newVal / n;
   } 
 
-  public void accumQuadMean(double newVal, int n) {
+  public void accumQuadMean(double newVal, long n) {
     quadMean = (n - 1) * quadMean / n + newVal / n;
   }
 }

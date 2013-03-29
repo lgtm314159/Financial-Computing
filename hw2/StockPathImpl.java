@@ -11,6 +11,14 @@ public class StockPathImpl implements StockPath {
   private int days;
   private boolean isToAnti = false;
 
+  /*
+   * Constructor to initialize a StockPathImpl object.
+   *
+   * @param originPrice, the original price of a stock
+   * @param volatility, the volatility of a stock
+   * @param r, the interest rate
+   * @param days, the number of days of this stock option 
+   */
   public StockPathImpl(double originPrice, double volatility, double r,
       int days) {
     this.originPrice = originPrice;
@@ -21,6 +29,12 @@ public class StockPathImpl implements StockPath {
     antiTheticRvg = new AntiTheticDecorator((RandomVectorGeneratorImpl) rvg);
   }
 
+  /*
+   * Method to generate a list of prices.
+   *
+   * @param randomVector, an array of random numbers
+   * @return a list of Pair objects, each of which has a datetime and a price.
+   */
   List<Pair<DateTime, Double>> generatePrices(double[] randomVector) {
     LinkedList<Pair<DateTime, Double>> prices = 
         new LinkedList<Pair<DateTime, Double>>();
@@ -43,6 +57,11 @@ public class StockPathImpl implements StockPath {
     return prices;
   }
 
+  /*
+   * Method to get a list of prices.
+   *
+   * @return a list of prices.
+   */
   public List<Pair<DateTime, Double>> getPrices() {
     if (!isToAnti) {
       isToAnti = true;
