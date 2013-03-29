@@ -1,3 +1,5 @@
+package hw2;
+
 import org.apache.commons.math3.analysis.function.Exp;
 import org.apache.commons.math3.analysis.function.Sqrt;
 import org.joda.time.DateTime;

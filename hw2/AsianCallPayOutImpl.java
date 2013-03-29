@@ -1,3 +1,5 @@
+package hw2;
+
 import java.util.List;
 import java.util.LinkedList;
 import org.apache.commons.math3.analysis.function.Max;
@@ -6,10 +8,20 @@ import org.joda.time.DateTime;
 public class AsianCallPayOutImpl implements PayOut {
   private double strikePrice;
 
+  /*
+   * Constructor.
+   *
+   * @param strikePrice, the strike price of a stock option.
+   */
   public AsianCallPayOutImpl(double strikePrice) {
     this.strikePrice = strikePrice;
   }
 
+  /*
+   * Method to calculate payout.
+   *
+   * @param path, a StockPath instance for generating stock paths.
+   */
   public double getPayout(StockPath path) {
     LinkedList<Pair<DateTime, Double>> prices =
         new LinkedList<Pair<DateTime, Double>>();
@@ -23,8 +35,6 @@ public class AsianCallPayOutImpl implements PayOut {
     for (Pair<DateTime, Double> price: prices) {
       total += price.getRight(); 
     }
-    //System.out.println(total);
-    //System.out.println(total / prices.size());
     return max.value(0, total / prices.size() - strikePrice);
   }
 }

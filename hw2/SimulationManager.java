@@ -1,3 +1,5 @@
+package hw2;
+
 import org.apache.commons.math3.analysis.function.Exp;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.commons.math3.analysis.function.Sqrt;
@@ -60,7 +62,6 @@ public class SimulationManager {
       // Update n accordingly.
       n = (long) ceil.value((q * stdDeviEu / (error * accumulatorEu.getMean()))
           * (q * stdDeviEu / (error * accumulatorEu.getMean())));
-      //System.out.println(n + " " + i);
     }
     double euCallOptionPrice = accumulatorEu.getMean() * constant;
     System.out.println("EU call option price is: " + euCallOptionPrice);
@@ -90,7 +91,6 @@ public class SimulationManager {
       n = (long) ceil.value(
           (q * stdDeviAsian / (error * accumulatorAsian.getMean()))
           * (q * stdDeviAsian / (error * accumulatorAsian.getMean())));
-      //System.out.println(n + " " + i);
     }
     double asianCallOptionPrice = accumulatorAsian.getMean() * constant;
     System.out.println("Asian call option price is: " + asianCallOptionPrice);

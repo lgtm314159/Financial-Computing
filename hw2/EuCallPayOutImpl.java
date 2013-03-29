@@ -1,3 +1,5 @@
+package hw2;
+
 import java.util.List;
 import java.util.LinkedList;
 import org.apache.commons.math3.analysis.function.Max;
@@ -6,10 +8,20 @@ import org.joda.time.DateTime;
 public class EuCallPayOutImpl implements PayOut {
   private double strikePrice;
 
+  /*
+   * Constructor.
+   *
+   * @param strikePrice, the strike price of a stock option.
+   */
   public EuCallPayOutImpl(double strikePrice) {
     this.strikePrice = strikePrice;
   }
 
+  /*
+   * Method to calculate payout.
+   *
+   * @param path, a StockPath instance for generating stock paths.
+   */
   public double getPayout(StockPath path) {
     LinkedList<Pair<DateTime, Double>> prices =
         new LinkedList<Pair<DateTime, Double>>();

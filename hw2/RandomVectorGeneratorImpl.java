@@ -1,3 +1,5 @@
+package hw2;
+
 import org.apache.commons.math3.random.GaussianRandomGenerator;
 import org.apache.commons.math3.random.JDKRandomGenerator;
 
@@ -5,9 +7,15 @@ public class RandomVectorGeneratorImpl implements RandomVectorGenerator {
   private double[] rdVec = null;
   GaussianRandomGenerator gr;
 
-  public RandomVectorGeneratorImpl(int size) throws IllegalArgumentException {
+  /*
+   * Constructor with vector size intializatoin.
+   *
+   * @param size, the size of the random vector
+   */
+  public RandomVectorGeneratorImpl(int size) { 
     if (size <= 0) {
-      throw new IllegalArgumentException();
+      System.err.println("Invalid vector size!");
+      System.exit(-1);
     } else {
       rdVec = new double[size];
       JDKRandomGenerator jdkRg= new JDKRandomGenerator();
@@ -16,25 +24,28 @@ public class RandomVectorGeneratorImpl implements RandomVectorGenerator {
     } 
   }
 
+  /*
+   * Method to get current random vector. This for decoration purpose.
+   *
+   * @return a double array of random numbers representing a random vector
+   */
   double[] getCurrentVector() {
     return rdVec;
   }
 
+  /*
+   * Method to generate a random vector. This for decoration purpose.
+   *
+   * @return a double array of random numbers representing a random vector
+   */
   public double[] getVector() {
     for (int i = 0; i < rdVec.length; ++i) {
       rdVec[i] = gr.nextNormalizedDouble();
     }
-    
-    /*
-    System.out.print("Vector of size " + rdVec.length + ": ");
-    for (int i = 0; i < rdVec.length; ++i) {
-      System.out.print(rdVec[i] + " ");
-    }
-    System.out.println("\n");
-    */
     return rdVec;
   }
 
+  /* The main function is for testing the random vector genration. */
   public static void main(String[] args) {
     RandomVectorGenerator rd = new RandomVectorGeneratorImpl(252);
     if (rd instanceof RandomVectorGeneratorImpl) {

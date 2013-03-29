@@ -1,3 +1,6 @@
+package hw2;
+
+/* Helper class to store information. */
 public class Pair<T, U> {
   T left;
   U right;
