@@ -1,3 +1,7 @@
+/* Author: Junyang Xin (jx372@nyu.edu)
+ * Date: 3/29/2013
+ */
+
 package hw2;
 
 import org.apache.commons.math3.random.GaussianRandomGenerator;

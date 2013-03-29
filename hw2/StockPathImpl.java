@@ -1,3 +1,7 @@
+/* Author: Junyang Xin (jx372@nyu.edu)
+ * Date: 3/29/2013
+ */
+
 package hw2;
 
 import org.apache.commons.math3.analysis.function.Exp;
@@ -73,5 +77,11 @@ public class StockPathImpl implements StockPath {
       return generatePrices(antiTheticRvg.getVector());
     }
   } 
+
+  /* This main method is only for testing purpose. */
+  public static void main(String[] args) {
+    StockPathImpl stockPath = new StockPathImpl(152.35, 0.01, 0.0001, 252);
+    System.out.println(stockPath.getPrices());
+  }
 }
 

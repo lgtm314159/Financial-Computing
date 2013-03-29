@@ -1,3 +1,7 @@
+/* Author: Junyang Xin (jx372@nyu.edu)
+ * Date: 3/29/2013
+ */
+
 package hw2;
 
 class AntiTheticDecorator implements RandomVectorGenerator {
@@ -15,11 +19,12 @@ class AntiTheticDecorator implements RandomVectorGenerator {
   @Override
   public double[] getVector() {
     double[] rdVec = rvg.getCurrentVector();
+    double[] antiRdVec = new double[rdVec.length];
     // Decorate the vector into its anti-thetic counter part.
     for (int i = 0; i < rdVec.length; ++i) {
-      rdVec[i] = -rdVec[i];
+      antiRdVec[i] = -rdVec[i];
     }
-    return rdVec;
+    return antiRdVec;
   }
 } 
 

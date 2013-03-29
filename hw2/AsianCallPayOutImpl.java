@@ -1,3 +1,7 @@
+/* Author: Junyang Xin (jx372@nyu.edu)
+ * Date: 3/29/2013
+ */
+
 package hw2;
 
 import java.util.List;
@@ -36,6 +40,13 @@ public class AsianCallPayOutImpl implements PayOut {
       total += price.getRight(); 
     }
     return max.value(0, total / prices.size() - strikePrice);
+  }
+
+  /* This main method is only for testing purpose. */
+  public static void main(String[] args) {
+    AsianCallPayOutImpl asianPayOut = new AsianCallPayOutImpl(164);
+    StockPathImpl stockPath = new StockPathImpl(152.35, 0.01, 0.0001, 252);
+    System.out.println(asianPayOut.getPayout(stockPath));
   }
 }
 
