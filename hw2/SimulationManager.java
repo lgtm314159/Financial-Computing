@@ -73,6 +73,7 @@ public class SimulationManager {
       if (n == 0) {
         n = 10000;
       }
+      System.out.println(n + " " + i);
     }
     double euCallOptionPrice = accumulatorEu.getMean() * constant;
     System.out.println("EU call option price is: " + euCallOptionPrice);
@@ -108,6 +109,7 @@ public class SimulationManager {
       if (n == 0) {
         n = 10000;
       }
+      System.out.println(n + " " + i);
     }
     double asianCallOptionPrice = accumulatorAsian.getMean() * constant;
     System.out.println("Asian call option price is: " + asianCallOptionPrice);
