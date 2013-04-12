@@ -1,5 +1,6 @@
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.ActiveMQConnection;
+import org.apache.activemq.broker.BrokerService;
 
 import javax.jms.Connection;
 import javax.jms.DeliveryMode;
@@ -12,6 +13,7 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 import javax.jms.Topic;
+import java.net.ConnectException;
 
 import hw2.StockPathImpl;
 import hw2.EuCallPayOutImpl;
@@ -35,9 +37,12 @@ public class Client implements Runnable, ExceptionListener {
 
   public void run() {
     try {
+
       // Create a ConnectionFactory
-      String url = ActiveMQConnection.DEFAULT_BROKER_URL;
-      ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(url);
+      //String url = ActiveMQConnection.DEFAULT_BROKER_URL;
+      //ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(url);
+      ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("tcp://localhost:61616");
+      
 
       // Create a Connection
       connection = connectionFactory.createConnection();
@@ -66,15 +71,30 @@ public class Client implements Runnable, ExceptionListener {
         } else {
           System.out.println("Received: " + message);
           ++nullMsgCnt;
-          if (nullMsgCnt == 10)
+          if (nullMsgCnt == 10) {
+            System.out.println("Client has been idle for 10 seconds, " +
+                "shutting down now");
             break;
+          }
         }
       }
       
       cleanUp();
+    //} catch (java.net.ConnectException e) {
+    //  System.out.println("Broker hasn't been started yet! Please start it!");
+    //  System.exit(0);
     } catch (Exception e) {
-      System.out.println("Caught: " + e);
-      e.printStackTrace();
+      if (e.toString().indexOf("java.net.ConnectException") >= 0) {
+        System.out.println("Connection refused " +
+            "because the broker hasn't been started. ");
+        System.out.println("Please start the broker by starting the server.");
+        System.out.println("Shutting down client now.");
+      }
+
+      if (e.toString().indexOf("EOFException") >= 0) {
+        System.out.println("Server connection closed. Shutting down client.");
+      }
+      System.exit(0);
     }
   }
 
@@ -154,13 +174,14 @@ public class Client implements Runnable, ExceptionListener {
       if (connection != null)
         connection.close();
     } catch (Exception e) {
-      System.out.println("Caught: " + e);
-      e.printStackTrace();
+      //System.out.println("Caught: " + e);
+      //e.printStackTrace();
+      System.exit(0);
     }
   }
 
   public synchronized void onException(JMSException ex) {
-      System.out.println("JMS Exception occured.  Shutting down client.");
+    //System.out.println("JMS Exception occured.  Shutting down client.");
   }
 
   /* Method to launch a thread. */

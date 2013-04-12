@@ -1,5 +1,6 @@
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.ActiveMQConnection;
+import org.apache.activemq.broker.BrokerService;
 
 import javax.jms.Connection;
 import javax.jms.DeliveryMode;
@@ -46,8 +47,16 @@ public class Server implements Runnable {
   public void run() {
     try {
       // Create a ConnectionFactory
-      String url = ActiveMQConnection.DEFAULT_BROKER_URL;
-      ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(url);
+
+      BrokerService broker = new BrokerService();
+      broker.setPersistent(false);
+      broker.setUseJmx(false);
+      broker.addConnector("tcp://localhost:61616");
+      broker.start();
+
+      //String url = ActiveMQConnection.DEFAULT_BROKER_URL;
+      //ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(url);
+      ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("tcp://localhost:61616");
 
       // Create a Connection
       connection = connectionFactory.createConnection();
