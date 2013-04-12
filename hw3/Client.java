@@ -1,6 +1,5 @@
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.ActiveMQConnection;
-//import org.apache.activemq.Context;
 
 import javax.jms.Connection;
 import javax.jms.DeliveryMode;
@@ -18,8 +17,6 @@ import hw2.StockPathImpl;
 import hw2.EuCallPayOutImpl;
 import hw2.AsianCallPayOutImpl;
 import hw2.PayOut;
-
-import javax.naming.InitialContext;
 
 public class Client implements Runnable, ExceptionListener {
   private Connection connection; 
@@ -41,13 +38,9 @@ public class Client implements Runnable, ExceptionListener {
       // Create a ConnectionFactory
       String url = ActiveMQConnection.DEFAULT_BROKER_URL;
       ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(url);
-      //ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("vm://localhost");
-      //InitialContext ct = new InitialContext();
-      //ActiveMQConnectionFactory cf = (ActiveMQConnectionFactory)ct.lookup("/localhost");
 
       // Create a Connection
       connection = connectionFactory.createConnection();
-      //connection = cf.createConnection();
       connection.start();
       connection.setExceptionListener(this);
 
@@ -85,6 +78,12 @@ public class Client implements Runnable, ExceptionListener {
     }
   }
 
+  /*
+   * Method to process a simulation request.
+   *
+   * @param: message, a simulation request message.
+   * @return: a String[] object contains the calculated payout and the topic.
+   */
   private String[] processSimReq(Message message)
       throws javax.jms.JMSException {
     TextMessage simReqMsg= (TextMessage) message;
@@ -99,6 +98,7 @@ public class Client implements Runnable, ExceptionListener {
     int duration = Integer.valueOf(fields[5]);
 
     StockPathImpl stockPath = new StockPathImpl(originPrice, sigma, r, duration); 
+    // Handle the auction type correspondingly.
     if (auctionType.equals("EuCall")) {
       PayOut euCallPayOut = new EuCallPayOutImpl(strikePrice);
       double euPayOut = euCallPayOut.getPayout(stockPath);
@@ -119,6 +119,12 @@ public class Client implements Runnable, ExceptionListener {
     }
   }
 
+  /*
+   * Method to send the simulation result.
+   *
+   * @param result, a String[] object containing the calculated payout and
+   *        the topic.
+   */
   private void sendSimRes(String[] result) throws javax.jms.JMSException {
     // If it's the first of sending simulation results, or the topic has
     // been changed, then create a new message producer with the given topic.
@@ -134,6 +140,7 @@ public class Client implements Runnable, ExceptionListener {
     resProducer.send(simResMsg);
   }
 
+  /* Method to do the clean up, i.e. closing resources. */
   private void cleanUp() {
     try {
       if (reqConsumer != null)
@@ -156,6 +163,7 @@ public class Client implements Runnable, ExceptionListener {
       System.out.println("JMS Exception occured.  Shutting down client.");
   }
 
+  /* Method to launch a thread. */
   public static void thread(Runnable runnable, boolean daemon) {
     Thread brokerThread = new Thread(runnable);
     brokerThread.setDaemon(daemon);

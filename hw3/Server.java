@@ -43,18 +43,11 @@ public class Server implements Runnable {
     thread(new Server(0.96, 0.01), false);
   }
 
-  public static void thread(Runnable runnable, boolean daemon) {
-    Thread brokerThread = new Thread(runnable);
-    brokerThread.setDaemon(daemon);
-    brokerThread.start();
-  }
-
   public void run() {
     try {
       // Create a ConnectionFactory
       String url = ActiveMQConnection.DEFAULT_BROKER_URL;
       ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(url);
-      //ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("vm://localhost");
 
       // Create a Connection
       connection = connectionFactory.createConnection();
@@ -229,6 +222,17 @@ public class Server implements Runnable {
     }
   }
 
+  /*
+   * Method to send the simulation request.
+   *
+   * @param r, the interest rate
+   * @param sigma, the volatility 
+   * @param strikePrice, the strike price
+   * @param originPrice, the original price
+   * @param auctionType, the type of auction to simulation 
+   * @param duration, the option's duaration 
+   * @param topic, the topic for simulation result messages 
+   */
   private void sendSimReq(double r, double sigma, double strikePrice,
       double originPrice, String auctionType, int duration, String topic)
       throws javax.jms.JMSException {
@@ -251,12 +255,19 @@ public class Server implements Runnable {
     reqProducer.send(simReqMsg);
   }
 
+  /*
+   * Method to process simulation result message.
+   *
+   * @param: message, the simulation result message
+   * @return: the payout received from client
+   */
   private double processSimRes(Message message) throws javax.jms.JMSException {
     TextMessage simResMsg= (TextMessage) message;
     String resText = simResMsg.getText();
     return Double.valueOf(resText);
   }
 
+  /* Method to do the clean up, i.e. closing resources. */
   private void cleanUp() {
     try {
       if (reqProducer != null)
@@ -273,6 +284,13 @@ public class Server implements Runnable {
       System.out.println("Caught: " + e);
       e.printStackTrace();
     }
+  }
+
+  /* Method to launch a thread. */
+  public static void thread(Runnable runnable, boolean daemon) {
+    Thread brokerThread = new Thread(runnable);
+    brokerThread.setDaemon(daemon);
+    brokerThread.start();
   }
 }
 
