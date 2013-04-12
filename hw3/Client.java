@@ -1,4 +1,6 @@
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.ActiveMQConnection;
+//import org.apache.activemq.Context;
 
 import javax.jms.Connection;
 import javax.jms.DeliveryMode;
@@ -17,6 +19,8 @@ import hw2.EuCallPayOutImpl;
 import hw2.AsianCallPayOutImpl;
 import hw2.PayOut;
 
+import javax.naming.InitialContext;
+
 public class Client implements Runnable, ExceptionListener {
   private Connection connection; 
   private Session reqSession;
@@ -28,13 +32,22 @@ public class Client implements Runnable, ExceptionListener {
   private AsianCallPayOutImpl asianCallPayOut;
   private String topic;
 
+  public static void main(String[] args) {
+    thread(new Client(), false);
+  }
+
   public void run() {
     try {
       // Create a ConnectionFactory
-      ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("vm://localhost");
+      String url = ActiveMQConnection.DEFAULT_BROKER_URL;
+      ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(url);
+      //ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("vm://localhost");
+      //InitialContext ct = new InitialContext();
+      //ActiveMQConnectionFactory cf = (ActiveMQConnectionFactory)ct.lookup("/localhost");
 
       // Create a Connection
       connection = connectionFactory.createConnection();
+      //connection = cf.createConnection();
       connection.start();
       connection.setExceptionListener(this);
 
@@ -47,48 +60,22 @@ public class Client implements Runnable, ExceptionListener {
 
       // Create a session for the simulation results
       resSession = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-      /*
-      // Create a topic for the simulation results
-      Topic resTopic = resSession.createTopic("SimulationResult");
-      // Create a MessageProducer for sending the simulation results 
-      resProducer = resSession.createProducer(resTopic);
-      resProducer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
-      */
 
       int nullMsgCnt = 0;
-      for(;;) {
-        /*
-        // Wait for a simulation request 
-        Message message = reqConsumer.receive(1000);
-
-        if (message instanceof TextMessage) {
-          TextMessage simReqMsg= (TextMessage) message;
-          String text = simReqMsg.getText();
-          System.out.println("Received: " + text);
-
-          // Send back simulation result.
-          String simResText = "Simulation result from: " + Thread.currentThread().getName() + " : " + "Client";
-          TextMessage simResMsg = resSession.createTextMessage(simResText);
-          System.out.println("Sent simulation result: "+ simResMsg.hashCode() + " : " + Thread.currentThread().getName());
-          resProducer.send(simResMsg);
-        } else {
-            System.out.println("Received: " + message);
-        }
-        */
-
+      for (;;) {
         // Wait for a simulation request 
         Message message = reqConsumer.receive(1000);
         if (message instanceof TextMessage) {
           String[] result = processSimReq(message);
-          sendSimRes(result);
+          if (result != null) { 
+            sendSimRes(result);
+          }
         } else {
           System.out.println("Received: " + message);
           ++nullMsgCnt;
           if (nullMsgCnt == 10)
             break;
         }
-
-        //Thread.sleep(1000);
       }
       
       cleanUp();
@@ -102,7 +89,6 @@ public class Client implements Runnable, ExceptionListener {
       throws javax.jms.JMSException {
     TextMessage simReqMsg= (TextMessage) message;
     String text = simReqMsg.getText();
-    //System.out.println("Received: " + text);
 
     String[] fields = text.split("\\|");
     double r = Double.valueOf(fields[0]);
@@ -120,13 +106,16 @@ public class Client implements Runnable, ExceptionListener {
       result[0] = euPayOut + "";
       result[1] = fields[6]; 
       return result;
-    } else {
+    } else if (auctionType.equals("AsianCall")) {
       PayOut asianCallPayOut = new AsianCallPayOutImpl(strikePrice);
       double asianPayOut = asianCallPayOut.getPayout(stockPath);
       String[] result = new String[2];
       result[0] = asianPayOut + "";
       result[1] = fields[6]; 
       return result;
+    } else {
+      System.out.println("unknown option type");
+      return null;
     }
   }
 
@@ -165,6 +154,12 @@ public class Client implements Runnable, ExceptionListener {
 
   public synchronized void onException(JMSException ex) {
       System.out.println("JMS Exception occured.  Shutting down client.");
+  }
+
+  public static void thread(Runnable runnable, boolean daemon) {
+    Thread brokerThread = new Thread(runnable);
+    brokerThread.setDaemon(daemon);
+    brokerThread.start();
   }
 }
 
