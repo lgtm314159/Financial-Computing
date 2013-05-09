@@ -31,7 +31,7 @@ public class SimulationManager {
     this.confIntervalProb = confIntervalProb;
     this.error = error;
     NormalDistribution nd = new NormalDistribution();
-    q = nd.inverseCumulativeProbability((confIntervalProb + 1) / 2);
+    q = nd.inverseCumulativeProbability((this.confIntervalProb + 1) / 2);
   }
 
   /*

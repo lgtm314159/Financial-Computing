@@ -31,7 +31,7 @@ public class StockPathImpl implements StockPath {
     this.volatility = volatility;
     this.r = r;
     this.days = days;
-    rvg = new RandomVectorGeneratorImpl(days);
+    rvg = new RandomVectorGeneratorImpl(this.days);
     antiTheticRvg = new AntiTheticDecorator((RandomVectorGeneratorImpl) rvg);
   }
 
