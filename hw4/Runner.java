@@ -1,19 +1,23 @@
+/**
+ * @author Junyang Xin <jx372@nyu.edu>
+ * @version 1.0
+ * @since 5/10/2013
+ */
 package hw4;
 
-import java.util.Iterator;
-import orderGenerator.Message;
-import orderGenerator.OrdersIterator;
-import orderGenerator.OrderCxR;
-import orderGenerator.NewOrder;
-
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeMap;
+import orderGenerator.Message;
+import orderGenerator.NewOrder;
+import orderGenerator.OrderCxR;
+import orderGenerator.OrdersIterator;
 
-/*
+/**
  * Class which replays the iterator and processes the messages.
  * Prints the top of the ask and bid books after processing every message.
  * Also prints out the trade record in the format 'order xxx traded with
@@ -25,13 +29,16 @@ public class Runner {
   private HashMap<String, TreeMap<Double, LinkedList<OrderOnBook>>> bid;
   private HashMap<String, OrderOnBook> lookupTable;
   
+  /**
+   * Default constructor which creates a Runner instance.
+   */
   public Runner() {
     ask = new HashMap<String, TreeMap<Double, LinkedList<OrderOnBook>>>();
     bid = new HashMap<String, TreeMap<Double, LinkedList<OrderOnBook>>>();
     lookupTable = new HashMap<String, OrderOnBook>();
   }
 
-  /*
+  /**
    * Method to replay the iterator and process the messages.
    */
   public void run() throws InvalidTradeException {
@@ -69,7 +76,7 @@ public class Runner {
     }
   }
 
-  /*
+  /**
    * Method to execute a new order.
    * 
    * @param order, an instance of OrderOnBook, which holds information
@@ -79,7 +86,7 @@ public class Runner {
    * @return, a boolean value indicating if this new order has been fully
    * executed, i.e. has been fully traded.
    */
-  public boolean execOrder(OrderOnBook order, boolean isSell)
+  private boolean execOrder(OrderOnBook order, boolean isSell)
       throws InvalidTradeException {
     if (order.getSize() == 0) {
       // It is invalid to trade a cancelled order.
@@ -154,7 +161,7 @@ public class Runner {
     }
   }
 
-  /*
+  /**
    * Method to execute a limit order.
    * 
    * @param size, the size of this limit order
@@ -230,7 +237,7 @@ public class Runner {
     }
   }
 
-  /*
+  /**
    * Method to execute a limit order at a certain price. This price is of a
    * corresponding order which this limit order is trading with.
    * 
@@ -283,7 +290,7 @@ public class Runner {
     return resultSize;
   }
 
-  /*
+  /**
    * Method to execute a market order.
    * 
    * @param size, the size of this limit order
@@ -344,16 +351,18 @@ public class Runner {
     return resultSize;
   }
 
-  /*
+  /**
    * Method to execute an order replacement/cancellation.
    * 
    * @param orderCxR, an object of type OrderCxR which holds the
    *                  replacement/cancellation information
+   * @throws InvalidTradeException 
    */
-  public void execOrderCxR(OrderCxR orderCxR) {
+  private void execOrderCxR(OrderCxR orderCxR) throws InvalidTradeException {
     // Set the replaced/cancelled order's size to 0 which indicates
     // it is now a dead order.
     lookupTable.get(orderCxR.getOrderId()).setSize(0);
+    
     if (orderCxR.getSize() != 0) {
       // This is an order replacement, so create a new order and
       // put it to the back of the corresponding queue.
@@ -361,21 +370,31 @@ public class Runner {
       OrderOnBook orderOnBook =
           new OrderOnBook(symbol, Math.abs(orderCxR.getSize()),
           orderCxR.getOrderId(), orderCxR.getLimitPrice());
+      
+      // Process sell order.
       if (orderCxR.getSize() < 0) {
-        insertToAskBook(orderOnBook);
+        boolean fullyExecuted = execOrder(orderOnBook, true);
+        if (!fullyExecuted) {
+          insertToAskBook(orderOnBook);
+        }
       }
+      
+      // Process buy order.
       if (orderCxR.getSize() > 0) {
-        insertToBidBook(orderOnBook);
+        boolean fullyExecuted = execOrder(orderOnBook, false);
+        if (!fullyExecuted) {
+          insertToBidBook(orderOnBook);
+        }
       }
     }
   }
 
-  /*
+  /**
    * Method to insert an order to the ask book.
    * 
    * @param orderOnBook, an instance of OrderOnBook.
    */
-  public void insertToAskBook(OrderOnBook orderOnBook) {
+  private void insertToAskBook(OrderOnBook orderOnBook) {
     if (ask.containsKey(orderOnBook.getSymbol())) {
       // If the ask book already have an entry for this order's symbol.
       TreeMap<Double, LinkedList<OrderOnBook>> subBook =
@@ -409,12 +428,12 @@ public class Runner {
     lookupTable.put(orderOnBook.getOrderId(), orderOnBook);
   }
 
-  /*
+  /**
    * Method to insert an order to the bid book.
    * 
    * @param orderOnBook, an instance of OrderOnBook.
    */
-  public void insertToBidBook(OrderOnBook orderOnBook) {
+  private void insertToBidBook(OrderOnBook orderOnBook) {
     if (bid.containsKey(orderOnBook.getSymbol())) {
       // If the bid book already have an entry for this order's symbol.
       TreeMap<Double, LinkedList<OrderOnBook>> subBook =
@@ -448,23 +467,45 @@ public class Runner {
     lookupTable.put(orderOnBook.getOrderId(), orderOnBook);
   }
 
-  /*
+  /**
    * Method to print the top of ask and bid books.
    */
   private void printTopOfBooks() {
     System.out.println("Top of the ask book:");
     for (Map.Entry<String, TreeMap<Double, LinkedList<OrderOnBook>>> entry: ask.entrySet()) {
-      System.out.print(entry.getKey() + " ");
-      System.out.println(entry.getValue().firstEntry().getValue());
+      StringBuffer sb = new StringBuffer();
+      sb.append(entry.getKey());
+      sb.append(" ");
+      // Skip dead order and only prints live order.
+      for (OrderOnBook order: entry.getValue().firstEntry().getValue()) {
+        if (order.getSize() > 0) {
+          sb.append(String.format("%.2f", order.getLimitPrice()));
+          sb.append(",ask,");
+          sb.append(order.getSize());
+          sb.append(" ");
+        }
+      }
+      System.out.println(sb);
     }
     System.out.println("Top of the bid book:");
     for (Map.Entry<String, TreeMap<Double, LinkedList<OrderOnBook>>> entry: bid.entrySet()) {
-      System.out.print(entry.getKey() + " ");
-      System.out.println(entry.getValue().lastEntry().getValue());
+      StringBuffer sb = new StringBuffer();
+      sb.append(entry.getKey());
+      sb.append(": ");
+      for (OrderOnBook order: entry.getValue().lowerEntry(Double.NaN).getValue()) {
+        // Skip dead order and only prints live order.
+        if (order.getSize() > 0) {
+          sb.append(String.format("%.2f", order.getLimitPrice()));
+          sb.append(",bid,");
+          sb.append(order.getSize());
+          sb.append(" ");
+        }
+      }
+      System.out.println(sb);
     }
   }
 
-  /*
+  /**
    * Method to print a trade.
    */
   private void printTrade(String traderId, String tradeeId) {
@@ -473,7 +514,7 @@ public class Runner {
     System.out.println(output);
   }
 
-  /*
+  /**
    * Main method to run the simulation.
    */
   public static void main(String[] args) {

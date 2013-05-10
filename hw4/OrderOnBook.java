@@ -1,6 +1,6 @@
 package hw4;
 
-/*
+/**
  * Class that represents an order on a ask/bid book.
  */
 public class OrderOnBook {
@@ -10,7 +10,7 @@ public class OrderOnBook {
   private double limitPrice;
   boolean dead;
 
-  /*
+  /**
    * Class constructor that specifies the symbol, size, id and limit price
    * of an order.
    * 
@@ -29,7 +29,7 @@ public class OrderOnBook {
     this.dead = false;
   }
 
-  /*
+  /**
    * Method to get the symbol of this order.
    * 
    * @return, the symbol of this order
@@ -38,7 +38,7 @@ public class OrderOnBook {
     return symbol;
   }
 
-  /*
+  /**
    * Method to get the size of this order.
    * 
    * @return, the size of this order
@@ -47,7 +47,7 @@ public class OrderOnBook {
     return size;
   }
 
-  /*
+  /**
    * Method to set the size of this order.
    * 
    * @param newSize, the new size of this order
@@ -56,7 +56,7 @@ public class OrderOnBook {
     size = newSize;
   }
 
-  /*
+  /**
    * Method to get the id of this order.
    * 
    * @return, the id of this order
@@ -65,7 +65,7 @@ public class OrderOnBook {
     return orderId;
   }
 
-  /*
+  /**
    * Method to get the limit price of this order.
    * 
    * @return, the limit price of this order
@@ -74,7 +74,7 @@ public class OrderOnBook {
     return limitPrice;
   }
 
-  /*
+  /**
    * (non-Javadoc)
    * @see java.lang.Object#toString()
    */
@@ -92,7 +92,7 @@ public class OrderOnBook {
     sb.append(" Size:");
     sb.append(size);
     sb.append(" Price:");
-    sb.append(limitPrice);
+    sb.append(String.format("%.2f", limitPrice));
     return sb.toString();
   }
 }
